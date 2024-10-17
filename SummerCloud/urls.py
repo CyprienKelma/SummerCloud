@@ -15,8 +15,18 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
+from django.conf import settings
+from django.conf.urls.static import static
+
+import drive.views
 
 urlpatterns = [
+    # Page d'accueil du site (quad on est pas connect)
+    path('', drive.views.landing_page, name='landing_page'),
     path('admin/', admin.site.urls),
+    path('drive/', include('drive.urls')),
+    path('accounts/', include('django.contrib.auth.urls')),
 ]
+
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
