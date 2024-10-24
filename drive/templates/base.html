@@ -1,0 +1,30 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Summer Cloud{% endblock %}</title>
+
+</head>
+<body class="bg-gradient-to-r from-blue-400 to-blue-600 min-h-screen min-w-full justify-between">
+    <header class="bg-white p-4 shadow min-h-20">
+        <nav class="flex justify-between items-center">
+            <h1 class="text-blue-500 text-xl font-bold">Summer Cloud (moche mais le back avance tqt)</h1>
+            <ul class="flex space-x-4">
+                <li><a href="{% url 'user_files' %}" class="text-blue-500 hover:text-blue-700">My Drive</a></li>
+                <li><a href="{% url 'custom_logout' %}" class="text-blue-500 hover:text-blue-700">Sign Out</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="flex-grow p-6">
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <footer class="bg-white p-4 text-center">
+        <p>&copy; 2024 - Summer Cloud Inc</p>
+    </footer>
+</body>
+</html>

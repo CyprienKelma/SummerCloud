@@ -60,6 +60,7 @@ TEMPLATES = [
         'DIRS': [
             BASE_DIR / 'templates',  # Global templates directory
             BASE_DIR / 'drive' / 'templates',  # Drive app templates directory
+            os.path.join(BASE_DIR, 'templates')
         ],
         'APP_DIRS': True,
         'OPTIONS': {

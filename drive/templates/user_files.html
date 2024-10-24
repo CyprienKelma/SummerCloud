@@ -1,22 +1,48 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Your Files</title>
-</head>
-<body>
-    <h2>Your Files</h2>
-    <ul>
-        {% for file in files %}
-            <li>{{ file }}</li>
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mx-auto">
+    <h2 class="text-2xl font-bold mb-4 text-white">File Manager</h2>
+
+    {% if current_folder %}
+        {% if current_folder.parent_folder %}
+            <a href="{% url 'file_manager' current_folder.parent_folder.id %}" class="text-blue-200 hover:text-blue-400">Retour</a>
+        {% else %}
+            <a href="{% url 'user_files' %}" class="text-blue-200 hover:text-blue-400">Retour</a>
+        {% endif %}
+    {% endif %}
+
+    <h3 class="text-xl font-semibold mt-6 text-white">Dossiers</h3>
+    <ul class="mb-4">
+        {% for folder in folders %}
+            <li class="mb-2">
+                <a href="{% url 'file_manager' folder.id %}" class="text-blue-200 hover:text-blue-400">{{ folder.name }}</a>
+            </li>
         {% empty %}
-            <li>No files found.</li>
+            <li class="text-white">Aucun dossier</li>
         {% endfor %}
     </ul>
-    <form method="POST" action="{% url 'logout' %}">
-        {% csrf_token %}
-        <button type="submit">Logout</button>
-    </form>
-</body>
-</html>
+
+    <h3 class="text-xl font-semibold mt-6 text-white">Fichiers</h3>
+    <ul class="mb-4">
+        {% for file in files %}
+            <li class="mb-2 flex items-center">
+                <a href="{{ file.file.url }}" class="text-blue-200 hover:text-blue-400">{{ file.name }}</a> ({{ file.size_in_mb }} Mo)
+                <form method="post" action="{% url 'delete_file' file.id %}" class="inline ml-2">
+                    {% csrf_token %}
+                    <button type="submit" class="text-red-500 hover:text-red-700">
+                        Delete
+                    </button>
+                </form>
+            </li>
+        {% empty %}
+            <li class="text-white">Aucun fichier</li>
+        {% endfor %}
+    </ul>
+
+    <div class="mt-6">
+        <a href="{% url 'upload_file' %}" class="bg-white text-blue-500 px-4 py-2 rounded-md mr-2">Uploader un fichier</a>
+        <a href="{% url 'create_folder' %}" class="bg-white text-blue-500 px-4 py-2 rounded-md">Créer un dossier</a>
+    </div>
+</div>
+{% endblock %}
