@@ -1,0 +1,16 @@
+{
+  "name": "summercloud",
+  "version": "1.0.0",
+  "description": "Projet Django avec Tailwind CSS",
+  "main": "index.js",
+  "scripts": {
+    "build": "npx tailwindcss -i ./static/css/tailwind.css -o ./static/css/output.css --watch"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "autoprefixer": "^10.4.0",
+    "postcss": "^8.4.0",
+    "tailwindcss": "^3.0.0"
+  }
+}

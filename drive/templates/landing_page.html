@@ -2,9 +2,24 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Summer Cloud</title>
+    
+    <!-- Charger les balises statiques -->
+    {% load static %}
+    
+    <!-- Lien vers le fichier CSS généré par Tailwind -->
+    <link href="{% static 'css/output.css' %}" rel="stylesheet">
 </head>
-<body>
-    <h1>Welcome to Summer Cloud</h1>
+<body class="bg-gradient-to-r from-blue-400 to-blue-600 h-screen grid items-center justify-center">
+    <div class="text-center">
+        <h1 class="text-4xl font-bold text-white mb-4">Welcome to Summer Cloud</h1>
+        <p class="text-lg text-white">Your cloud storage solution, beautifully simple.</p>
+    </div>
+
+    <div class="mt-8 text-center">
+        <a href="{% url 'login' %}" class="bg-white text-blue-500 px-4 py-2 rounded-md mr-4">Login</a>
+        <a href="{% url 'signup' %}" class="bg-white text-blue-500 px-4 py-2 rounded-md">Sign up</a>
+    </div>
 </body>
 </html>
