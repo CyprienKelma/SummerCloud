@@ -11,3 +11,10 @@ local_settings.py
 db.sqlite3
 media/
 staticfiles/
+
+### Node ###
+node_modules/
+npm-debug.log
+yarn-error.log
+yarn-debug.log
+yarn.lock
