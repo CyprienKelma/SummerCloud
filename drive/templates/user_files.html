@@ -1,71 +1,111 @@
 {% extends 'base.html' %} {% block content %}
-<div class="container mx-auto">
-    <h2 class="text-2xl font-bold mb-4 text-white">File Manager</h2>
+<div class="sm:container sm:mx-auto gap-6 grid">
+    <div class="flex items-center sm:flex-row flex-col gap-4">
+        <div class="flex items-center justify-start gap-3">
+            <span class="material-symbols-outlined text-white">
+                folder_open
+            </span>
+            <div class="text-2xl font-bold text-white">
+                <a
+                    href="{% url 'user_files' %}"
+                    class="hover:text-blue-200 hover:underline"
+                >
+                    home
+                </a>
+                {% if path %} {% for name, id in path %}
+                <span class="">/</span>
+                <a
+                    href="{% url 'file_manager' id %}"
+                    class="hover:text-blue-200 hover:underline"
+                    >{{ name }}</a
+                >
+                {% endfor %} {% endif %}
+            </div>
+        </div>
 
-    {% if current_folder %} {% if current_folder.parent_folder %}
-    <a
-        href="{% url 'file_manager' current_folder.parent_folder.id %}"
-        class="text-blue-200 hover:text-blue-400"
-        >Retour</a
-    >
-    {% else %}
-    <a href="{% url 'user_files' %}" class="text-blue-200 hover:text-blue-400"
-        >Retour</a
-    >
-    {% endif %} {% endif %}
-
-    <h3 class="text-xl font-semibold mt-6 text-white">Dossiers</h3>
-    <ul class="mb-4">
-        {% for folder in folders %}
-        <li class="mb-2">
+        <div class="sm:ml-auto gap-2 flex">
             <a
-                href="{% url 'file_manager' folder.id %}"
-                class="text-blue-200 hover:text-blue-400"
-                >{{ folder.name }}</a
+                href="{% url 'upload_file' %}"
+                class="bg-white text-blue-500 px-3 py-2 rounded-md flex items-center gap-1 hover:bg-blue-600 hover:text-white hover:shadow-md"
+                ><span class="material-symbols-outlined"> cloud_upload </span
+                >Upload</a
             >
-        </li>
-        {% empty %}
-        <li class="text-white">Aucun dossier</li>
-        {% endfor %}
-    </ul>
-
-    <h3 class="text-xl font-semibold mt-6 text-white">Fichiers</h3>
-    <ul class="mb-4">
-        {% for file in files %}
-        <li class="mb-2 flex items-center">
             <a
-                href="{{ file.file.url }}"
-                class="text-blue-200 hover:text-blue-400"
-                >{{ file.name }}</a
+                href="{% url 'create_folder' %}"
+                class="bg-white text-blue-500 px-3 py-2 rounded-md flex items-center gap-1 hover:bg-blue-600 hover:text-white hover:shadow-md"
+                ><span class="material-symbols-outlined">
+                    create_new_folder </span
+                >New Folder</a
             >
-            ({{ file.size_in_mb }} Mo)
-            <form
-                method="post"
-                action="{% url 'delete_file' file.id %}"
-                class="inline ml-2"
-            >
-                {% csrf_token %}
-                <button type="submit" class="text-red-500 hover:text-red-700">
-                    Delete
-                </button>
-            </form>
-        </li>
-        {% empty %}
-        <li class="text-white">Aucun fichier</li>
-        {% endfor %}
-    </ul>
-
-    <div class="mt-6">
-        <a
-            href="{% url 'upload_file' %}"
-            class="bg-white text-blue-500 px-4 py-2 rounded-md mr-2"
-            >Uploader un fichier</a
-        >
-        <a
-            href="{% url 'create_folder' %}"
-            class="bg-white text-blue-500 px-4 py-2 rounded-md"
-            >Créer un dossier</a
-        >
+        </div>
     </div>
+
+    <table class="w-full text-white">
+        <tr class="border-b text-left">
+            <th>File Name</th>
+            <th>Size</th>
+            <th>Actions</th>
+        </tr>
+        {% for folder in folders %}
+        <tr>
+            <td>
+                <a
+                    href="{% url 'file_manager' folder.id %}"
+                    class="hover:text-blue-200 flex items-center gap-1"
+                    ><span class="material-symbols-outlined">folder</span>
+                    {{folder.name }}</a
+                >
+            </td>
+            <td>Folder</td>
+            <td>
+                <form
+                    method="post"
+                    action="{% url 'delete_folder' folder.id %}"
+                    class="inline"
+                >
+                    {% csrf_token %}
+                    <button
+                        type="submit"
+                        class="text-red-500 hover:text-red-700"
+                    >
+                        Delete
+                    </button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %} {% for file in files %}
+
+        <tr>
+            <td>
+                <a
+                    href="{{ file.file.url }}"
+                    class="hover:text-blue-200 flex items-center gap-1"
+                    ><span class="material-symbols-outlined"> description </span
+                    >{{ file.name }}</a
+                >
+            </td>
+            <td>{{ file.size_in_mb }} Mo</td>
+            <td>
+                <form
+                    method="post"
+                    action="{% url 'delete_file' file.id %}"
+                    class="inline"
+                >
+                    {% csrf_token %}
+                    <button
+                        type="submit"
+                        class="text-red-500 hover:text-red-700"
+                    >
+                        Delete
+                    </button>
+                </form>
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="3" class="text-white">No files</td>
+        </tr>
+        {% endfor %}
+    </table>
 </div>
 {% endblock %}

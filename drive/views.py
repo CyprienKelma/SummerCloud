@@ -37,15 +37,6 @@ def signup(request):
     return render(request, 'registration/signup.html', {'form': form})
 
 
-@login_required
-def user_files(request):
-    user_directory = os.path.join(settings.MEDIA_ROOT, f'user_{request.user.id}')
-
-    # Fichiers du user
-    files = os.listdir(user_directory) if os.path.exists(user_directory) else []
-
-    return render(request, 'user_files.html', {'files': files})
-
 
 
 def custom_logout(request):
@@ -103,11 +94,20 @@ def user_files(request, folder_id=None):
     # Fichiers du dossier courant (ou dossier racine si pas de sous dossier)
     files = File.objects.filter(folder=current_folder, owner=request.user)
 
+    # List qui represente le path des dossiers avec un tuple qui donne le nom et l'id
+    path = []
+    folder = current_folder
+    while folder:
+        path.append((folder.name, folder.id))
+        folder = folder.parent_folder
+    # Inverse la liste pour avoir le path du dossier courant au dossier racine
+    path = path[::-1]
+
     # Render la page avec les fichiers et dossiers du user
     return render(request, 'user_files.html', {
-        'current_folder': current_folder,
         'folders': folders,
         'files': files,
+        'path': path
     })
 
 

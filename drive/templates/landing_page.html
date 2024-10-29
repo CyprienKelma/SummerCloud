@@ -5,12 +5,23 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Summer Cloud</title>
         {% load static %}
+        <link href="{% static 'css/tailwind.css' %}" rel="stylesheet" />
         <link href="{% static 'css/output.css' %}" rel="stylesheet" />
+        <link
+            rel="stylesheet"
+            href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@40,400,0,0&icon_names=partly_cloudy_day"
+        />
     </head>
     <body
         class="bg-gradient-to-r from-blue-400 to-blue-600 h-screen grid items-center justify-center"
     >
         <div class="text-center">
+            <span
+                class="material-symbols-outlined text-white"
+                style="font-size: 5rem"
+            >
+                partly_cloudy_day
+            </span>
             <h1 class="text-4xl font-bold text-white mb-4">
                 Welcome to Summer Cloud
             </h1>
