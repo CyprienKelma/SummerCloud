@@ -1,5 +1,14 @@
 # Summer Cloud
 
+Summer Cloud is a Django web application that allows users to store files on the server. The files are stored in the server's file system. The application provides a web interface to manage files and folders.
+
+## Team
+- Nathan Eudeline
+- Cyprien Kelma
+- Paul Pousset
+- Nolan Cacheux
+
+
 ## Installation
 
 ```bash
@@ -24,8 +33,17 @@ or
 docker-compose up
 ```
 
-### Development
+**Demo user :**
 
+> *.sqlite3 file is provided with a demo user*
+
+> *the media folder is provided with some files*
+```txt
+username: bafbi
+password: TyTbfc%G#lCZL4
+```
+
+**Development :**
 ```bash
 source venv/bin/activate
 python3 manage.py runserver
@@ -83,7 +101,7 @@ The web application will provide the maximum of the following features:
 
 [ ] Preview the maximum of known formats (images, videos, pdf, source code, documents, ...)
 
-[ ] Setup script to install requirements and demo data in sqlite.
+[x] Setup script to install requirements and demo data in sqlite.
 
 [x] (3+ person group) Nice, beautiful, responsive UX (demo on laptop and smartphone)
 
