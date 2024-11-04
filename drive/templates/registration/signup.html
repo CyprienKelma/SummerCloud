@@ -1,28 +1,52 @@
-{% load static %}
-<!doctype html>
+{% extends 'registration/base.html' %} {% block content %}
 
-<html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <meta
-            name="description"
-            content="Sign up for an account on our platform."
-        />
-        <meta name="keywords" content="signup, registration, account, user" />
-        <title>Sign Up</title>
-        <link href="{% static 'css/tailwind.css' %}" rel="stylesheet" />
-    </head>
-    <body>
-        <h1 class="text-2xl font-bold">Sign Up</h1>
-        <form method="post" class="space-y-4">
-            {% csrf_token %} {{ form.as_p }}
+    <div class="container mx-auto">
+        <h2 class="text-white text-3xl font-bold mb-4">Sign Up</h2>
+        <form method="POST" class="gap-4 lg:max-w-[30%] space-y-3 font-semibold">
+            {% csrf_token %}
+            <div class="flex flex-col gap-2">
+                <label for="id_username" class="">Username:</label>
+                <input
+                    class="rounded-md border-2 border-gray-300 p-1 focus:outline-none focus:border-blue-500"
+                    type="text"
+                    name="username"
+                    id="id_username"
+                />
+            </div>
+            <div class="flex flex-col gap-2">
+                <label for="id_password1" class="">Password:</label>
+                <input
+                    class="rounded-md border-2 border-gray-300 p-1 focus:outline-none focus:border-blue-500"
+                    type="password"
+                    name="password1"
+                    id="id_password1"
+                />
+            </div>
+            <div class="flex flex-col gap-2 mb-4">
+                <label for="id_password2" class="">Confirm Password:</label>
+                <input
+                    class="rounded-md border-2 border-gray-300 p-1 focus:outline-none focus:border-blue-500"
+                    type="password"
+                    name="password2"
+                    id="id_password2"
+                />
+            </div>
             <button
                 type="submit"
-                class="bg-blue-500 text-white px-4 py-2 rounded"
+                class="bg-white text-blue-500 px-3 py-2 rounded-md flex items-center gap-1 hover:bg-blue-600
+                hover:text-white hover:shadow-md transition-colors duration-150 mt-6"
             >
+                <span class="material-symbols-outlined"> how_to_reg </span>
                 Sign Up
             </button>
         </form>
-    </body>
-</html>
+        <p class="mt-4">
+            Already have an account?
+            <a href="{% url 'login' %}" class="underline hover:text-blue-600"
+                >Login here!</a
+            >
+        </p>
+    </div>
+
+
+{% endblock %}

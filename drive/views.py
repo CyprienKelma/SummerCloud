@@ -11,7 +11,10 @@ from .models import Folder, File
 import os
 
 
-# Create your views here.
+MAX_FILE_SIZE = 1024 * 1024 * 40  # 40 Mo
+MAX_STORAGE_SIZE = 1024 * 1024 * 50  # 100 Mo
+
+
 def landing_page(request):
     return render(request, 'landing_page.html')
 
@@ -41,7 +44,6 @@ def signup(request):
 
 def custom_logout(request):
     logout(request)
-    messages.success(request, "Vous avez été déconnecté avec succès.")
     return render(request, 'landing_page.html')
 
 
@@ -55,6 +57,24 @@ def upload_file(request):
             file_instance.size = request.FILES['file'].size  # Calcul la taille du fichier (en octets)
             file_instance.name = request.FILES['file'].name
             file_instance.folder = form.cleaned_data['folder'] # Dossier dans lequel le fichier doit être enregistré
+
+            # Clear existing messages
+            storage = messages.get_messages(request)
+            storage.used = False
+
+            # Verifie si le fichier est trop gros
+            if file_instance.size > MAX_FILE_SIZE:
+                messages.error(request, "Désolé, ce fichier est trop volumineux. La taille maximale autorisée est de 40 Mo.")
+                return redirect('upload_file')
+
+            # Vérifie qu'ajouter ce fichier ne dépassera pas la limite de stockage totale
+            total_storage = sum([file.size for file in File.objects.filter(owner=request.user)]) + file_instance.size
+            if total_storage > MAX_STORAGE_SIZE:
+                messages.error(request, "Désolé, ce fichier est trop volumineux pour votre drive. "
+                                        "Vous avez atteint la limite de stockage de 100 Mo.")
+                return redirect('upload_file')
+
+
             file_instance.save()
             return redirect('user_files')  # Redirection après succès
     else:
@@ -115,12 +135,11 @@ def user_files(request, folder_id=None):
 def delete_file(request, file_id):
     file = get_object_or_404(File, id=file_id, owner=request.user)
     file.delete()
-    messages.success(request, "Fichier supprimé avec succès.")
+
     return HttpResponseRedirect(request.META.get('HTTP_REFERER', 'redirect_if_referer_not_found'))
 
 @login_required
 def delete_folder(request, folder_id):
     folder = get_object_or_404(Folder, id=folder_id, owner=request.user)
     folder.delete()
-    messages.success(request, "Dossier supprimé avec succès.")
     return HttpResponseRedirect(request.META.get('HTTP_REFERER', 'redirect_if_referer_not_found'))
