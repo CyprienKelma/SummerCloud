@@ -1,0 +1,10 @@
+# simple docker compose to run my django app from the docker image
+services:
+  app:
+    build: .
+    container_name: summer-cloud
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+    command: sh -c "python3 manage.py migrate --noinput && python3 manage.py runserver 0.0.0.0:8000"

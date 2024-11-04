@@ -1,0 +1,39 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link href="{% static 'css/tailwind.css' %}" rel="stylesheet" />
+        <link href="{% static 'css/output.css' %}" rel="stylesheet" />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined"
+            rel="stylesheet"
+        />
+
+        <title>{% block title %}Summer Cloud{% endblock %}</title>
+    </head>
+    <body
+        class="bg-gradient-to-r from-blue-400 to-blue-600 h-screen w-screen flex flex-col"
+    >
+        <header
+            class="bg-gray-50 shadow px-4 lg:px-6 h-14 flex items-center border-b"
+        >
+            <a
+                class="flex items-center justify-center gap-1"
+                href="{% url 'user_files' %}"
+            >
+                <span class="material-symbols-outlined text-blue-500">
+                    partly_cloudy_day
+                </span>
+                <h1 class="text-blue-500 text-xl font-bold">Summer Cloud</h1>
+            </a>
+        </header>
+
+        <main class="flex-grow p-6">{% block content %} {% endblock %}</main>
+
+        <footer class="bg-gray-50 p-4 text-center">
+            <p>&copy; 2024 - Summer Cloud Inc</p>
+        </footer>
+    </body>
+</html>

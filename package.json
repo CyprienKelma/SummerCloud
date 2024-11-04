@@ -1,0 +1,27 @@
+{
+  "name": "summercloud",
+  "version": "1.0.0",
+  "description": "Projet Django avec Tailwind CSS",
+  "scripts": {
+    "watch": "npx tailwindcss -i ./static/css/tailwind.css -o ./static/css/output.css --watch",
+    "build": "npx tailwindcss -i ./static/css/tailwind.css -o ./static/css/output.css"
+  },
+  "authors": [
+    "Eudeline Nathan",
+    "Kelma Cyprien",
+    "Pousset Paul",
+    "Cacheux Nolan"
+  ],
+  "license": "MIT",
+  "pre-commit": [
+    "build"
+  ],
+  "dependencies": {
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.4.47",
+    "tailwindcss": "^3.4.14"
+  },
+  "devDependencies": {
+    "pre-commit": "^1.2.2"
+  }
+}
