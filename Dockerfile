@@ -13,6 +13,3 @@ RUN pip install -r requirements.txt
 
 # Copy project
 COPY . /app/
-
-# Run server
-CMD python manage.py runserver
