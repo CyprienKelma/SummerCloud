@@ -8,10 +8,12 @@ from django.views.decorators.http import require_POST
 from .forms import FileUploadForm, FolderCreateForm
 from django.http import HttpResponseRedirect
 from .models import Folder, File
+from django.http import JsonResponse
+import json
 import os
 
 
-MAX_FILE_SIZE = 1024 * 1024 * 40  # 40 Mo
+MAX_FILE_SIZE = 1024 * 1024 * 10  # 40 Mo
 MAX_STORAGE_SIZE = 1024 * 1024 * 50  # 100 Mo
 
 
@@ -138,8 +140,47 @@ def delete_file(request, file_id):
 
     return HttpResponseRedirect(request.META.get('HTTP_REFERER', 'redirect_if_referer_not_found'))
 
+
 @login_required
 def delete_folder(request, folder_id):
     folder = get_object_or_404(Folder, id=folder_id, owner=request.user)
     folder.delete()
     return HttpResponseRedirect(request.META.get('HTTP_REFERER', 'redirect_if_referer_not_found'))
+
+
+@login_required
+@require_POST
+def move_item(request):
+    data = json.loads(request.body)
+    item_id = data.get("item_id")
+    item_type = data.get("item_type") # 'file' ou 'folder'
+    destination_folder_id = data.get("destination_folder_id")
+
+    print("Received item_id:", item_id)  # Log de vérification
+    print("Received item_type:", item_type)  # Log de vérification
+    print("Received destination_folder_id:", destination_folder_id)  # Log de vérification
+
+    try:
+        # Vérifie le type d'élément (file ou folder)
+        if item_type == "file":
+            item = get_object_or_404(File, id=item_id, owner=request.user)
+        elif item_type == "folder":
+            item = get_object_or_404(Folder, id=item_id, owner=request.user)
+        else:
+            return JsonResponse({"success": False, "message": "Invalid item type"})
+
+        # Gestion du dossier de destination :
+        # Cas où le dossier de destination est le repertoire racine
+        if destination_folder_id == "0":
+            destination_folder = None
+        else:
+            # Vérifie si le dossier de destination est correct et appartient à l'utilisateur
+            destination_folder = get_object_or_404(Folder, id=destination_folder_id, owner=request.user)
+
+        # On change le dossier parent de l'item par le nv dossier de destination
+        item.folder = destination_folder
+        item.save()
+
+        return JsonResponse({"success": True})
+    except Exception as e:
+        return JsonResponse({"success": False, "message": str(e)})
