@@ -11,6 +11,10 @@ from .models import Folder, File
 from django.http import JsonResponse
 import json
 import os
+from django.db.models import Sum
+from django.db.models.functions import TruncMonth
+from django.shortcuts import render
+from mimetypes import guess_type
 
 
 MAX_FILE_SIZE = 1024 * 1024 * 10  # 40 Mo
@@ -60,7 +64,24 @@ def upload_file(request):
             file_instance.name = request.FILES['file'].name
             file_instance.folder = form.cleaned_data['folder'] # Dossier dans lequel le fichier doit être enregistré
 
-            # Clear existing messages
+            # guess-type permet de determiner le type de fichier en fonction de son extension
+            mime_type, _ = guess_type(file_instance.name)
+            if mime_type:
+                if mime_type.startswith('image'):
+                    file_instance.type = 'image'
+                elif mime_type.startswith('video'):
+                    file_instance.type = 'video'
+                elif mime_type.startswith('audio'):
+                    file_instance.type = 'audio'
+                elif mime_type in ['application/pdf', 'application/msword',
+                                   'application/vnd.openxmlformats-officedocument.wordprocessingml.document']:
+                    file_instance.type = 'document'
+                else:
+                    file_instance.type = 'other'
+            else:
+                file_instance.type = 'other'
+
+            # Enlève les messages d'erreur passé s'il y en a
             storage = messages.get_messages(request)
             storage.used = False
 
@@ -115,6 +136,9 @@ def user_files(request, folder_id=None):
 
     # Fichiers du dossier courant (ou dossier racine si pas de sous dossier)
     files = File.objects.filter(folder=current_folder, owner=request.user)
+
+    for file in files:
+        file.is_pdf = file.file.name.lower().endswith('.pdf')
 
     # Ficher avec des meta-données en plus pour afficher les informations
     file_types = {
@@ -215,3 +239,33 @@ def move_item(request):
         return JsonResponse({"success": True})
     except Exception as e:
         return JsonResponse({"success": False, "message": str(e)})
+
+def profile(request):
+    # Données pour le graphique d'usage du stockagee par le user en fonction du temps
+    monthly_usage = (
+        File.objects.filter(owner=request.user)
+        .annotate(month=TruncMonth('upload_date'))
+        .values('month')
+        .annotate(total_size=Sum('size'))
+        .order_by('month')
+    )
+    months = [entry['month'].strftime('%Y-%m') for entry in monthly_usage]
+    sizes_over_time = [round(entry['total_size'] / (1024 * 1024), 2) for entry in monthly_usage]
+
+    # Données pour le graphique des différents types de fichiers du user
+    type_usage = (
+        File.objects.filter(owner=request.user)
+        .values('type')
+        .annotate(total_size=Sum('size'))
+        .order_by('type')
+    )
+    types = [entry['type'] for entry in type_usage]
+    sizes_by_type = [round(entry['total_size'] / (1024 * 1024), 2) for entry in type_usage]
+
+    return render(request, 'profile/profile.html', {
+        'months': months,
+        'sizes_over_time': sizes_over_time,
+        'types': types,
+        'sizes_by_type': sizes_by_type,
+        'account_creation_date': request.user.date_joined,
+    })

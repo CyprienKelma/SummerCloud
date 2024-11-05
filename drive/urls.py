@@ -12,6 +12,9 @@ urlpatterns = [
     # Inscription
     path('signup/', views.signup, name='signup'),
 
+    # Page de profile
+    path('profile/', views.profile, name='profile'),
+
     # Page de gestion des fichiers
     path('files/', views.user_files, name='user_files'),
 
@@ -31,4 +34,5 @@ urlpatterns = [
 
     # Déplacement d'un fichier/dossier (drag & drop)
     path('files/move-item/', views.move_item, name='move_item'),
+
 ]
