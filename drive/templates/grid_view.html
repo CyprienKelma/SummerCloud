@@ -1,13 +1,14 @@
 {% extends "layout.html" %} {% block files %}
 <div
-    class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 text-white"
+    class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 text-blue"
 >
     {% for folder in folders %}
-    <div class="bg-gray-800 p-4 rounded-lg">
+    <div class="bg-white p-4 rounded-lg text-blue-600">
         <!-- Folder Preview -->
         <a
-            href="{% url 'file_manager' folder.id %}"
+            href="{% url 'file_manager' folder.id %}?view={{ view_format }}"
             class="hover:text-blue-200 flex flex-col items-center gap-2"
+            data-folder-id="{{ folder.id }}" data-draggable
         >
             <span class="material-symbols-outlined text-5xl">folder</span>
             <span class="font-bold">{{ folder.name }}</span>
@@ -27,20 +28,21 @@
         </div>
     </div>
     {% endfor %} {% for file in files %}
-    <div class="bg-gray-800 p-4 rounded-lg">
+    <div class="bg-white p-4 rounded-lg text-blue-600">
         <!-- File Preview -->
         <a
             href="{{ file.file.url }}"
             alt="{{ file.name }}"
             target="_blank"
             class="hover:text-blue-200 flex flex-col items-center gap-2"
+            data-item-id="{{ file.id }}" data-item-type="file" data-draggable
         >
             {% if file.type == 'image' %}
             <!-- Image Preview -->
             <img
                 src="{{ file.file.url }}"
                 alt="{{ file.name }}"
-                class="w-24 h-24 object-cover rounded-lg"
+                class="w-24 h-24 object-cover rounded-lg text-blue"
             />
 
             {% elif file.type == 'video' %}
@@ -48,21 +50,21 @@
             <video class="w-24 h-24 object-cover rounded-lg" muted>
                 <source src="{{ file.file.url }}" type="video/mp4" />
                 <!-- Fallback icon if preview is unavailable -->
-                <span class="material-symbols-outlined text-5xl"
+                <span class="material-symbols-outlined text-6xl"
                     >video_library</span
                 >
             </video>
 
             {%elif file.type == 'audio'%}
             <!-- Audio Icon -->
-            <span class="material-symbols-outlined text-5xl">music_note</span>
+            <span class="material-symbols-outlined text-6xl">music_note</span>
 
             {%else%}
             <!-- Generic File Icon -->
-            <span class="material-symbols-outlined text-5xl">description</span>
+            <span class="material-symbols-outlined text-6xl">description</span>
 
             {%endif%}
-            <span class="font-bold">{{ file.name }}</span>
+            <span class="font-bold text-blue">{{ file.name }}</span>
         </a>
         <p class="text-sm mt-1">{{ file.size_in_mb }} Mo</p>
         <p class="text-sm">{{ file.type }}</p>
@@ -84,4 +86,76 @@
     {% endfor %}
 </div>
 
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const items = document.querySelectorAll("[data-draggable]");
+        const folders = document.querySelectorAll("[data-folder]");
+        const breadcrumbFolders = document.querySelectorAll("[data-folder-id]");
+
+        items.forEach((item) => {
+            item.draggable = true;
+            const itemType = item.dataset.itemType || (item.hasAttribute("data-folder") ? "folder" : "file");
+            item.setAttribute("data-item-type", itemType);
+            const itemId = itemType === "folder" ? item.dataset.folderId : item.dataset.itemId;
+
+            item.addEventListener("dragstart", (e) => {
+                if (!itemId || !itemType) {
+                    console.error("Missing item ID or item type");
+                    return;
+                }
+                e.dataTransfer.setData("text/plain", itemId);
+                e.dataTransfer.setData("item-type", itemType);
+            });
+        });
+
+        [...folders, ...breadcrumbFolders].forEach((folder) => {
+            folder.addEventListener("dragover", (e) => {
+                e.preventDefault();
+                folder.classList.add("drop-target");
+            });
+
+            folder.addEventListener("dragleave", () => {
+                folder.classList.remove("drop-target");
+            });
+
+            folder.addEventListener("drop", (e) => {
+                e.preventDefault();
+                folder.classList.remove("drop-target");
+
+                const itemId = e.dataTransfer.getData("text/plain");
+                const itemType = e.dataTransfer.getData("item-type");
+                const destinationFolderId = folder.dataset.folderId;
+
+                if (!itemId || !itemType) {
+                    console.error("Missing item ID or item type");
+                    return;
+                }
+
+                fetch(`/drive/files/move-item/`, {
+                    method: "POST",
+                    headers: {
+                        "X-CSRFToken": "{{ csrf_token }}",
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        item_id: itemId,
+                        item_type: itemType,
+                        destination_folder_id: destinationFolderId,
+                    }),
+                })
+                    .then((response) => response.json())
+                    .then((data) => {
+                        if (data.success) {
+                            location.reload();
+                        } else {
+                            alert(data.message);
+                        }
+                    })
+                    .catch((error) => {
+                        console.error("Error moving item:", error);
+                    });
+            });
+        });
+    });
+</script>
 {% endblock %}

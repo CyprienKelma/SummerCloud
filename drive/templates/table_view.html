@@ -16,7 +16,7 @@
     >
         <td>
             <a
-                href="{% url 'file_manager' folder.id %}"
+                href="{% url 'file_manager' folder.id %}?view={{ view_format }}"
                 class="hover:text-blue-200 flex items-center gap-1"
                 ><span class="material-symbols-outlined">folder</span>
                 {{folder.name }}</a

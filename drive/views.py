@@ -152,18 +152,16 @@ def user_files(request, folder_id=None):
 
     # Render la page avec les fichiers et dossiers du user
     view_format = request.GET.get('view', 'table')
-    if view_format == 'grid':
-        return render(request, 'grid_view.html', {
-            'folders': folders,
-            'files': files,
-            'path': path
-        })
-    else:
-        return render(request, 'table_view.html', {
+    context = {
         'folders': folders,
         'files': files,
-        'path': path
-    })
+        'path': path,
+        'view_format': view_format
+    }
+    if view_format == 'grid':
+        return render(request, 'grid_view.html', context)
+    else:
+        return render(request, 'table_view.html', context)
 
 
 @login_required

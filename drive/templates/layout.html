@@ -7,16 +7,18 @@
             </span>
             <div class="text-2xl font-bold text-white">
                 <a
-                    href="{% url 'user_files' %}"
+                    href="{% url 'user_files' %}?view={{ view_format }}"
                     class="hover:text-blue-200 hover:underline"
+                    data-folder-id="0"
                 >
                     home
                 </a>
                 {% if path %} {% for name, id in path %}
                 <span class="">/</span>
                 <a
-                    href="{% url 'file_manager' id %}"
+                    href="{% url 'file_manager' id %}?view={{ view_format }}"
                     class="hover:text-blue-200 hover:underline"
+                    data-folder-id="{{ id }}" data-draggable
                     >{{ name }}</a
                 >
                 {% endfor %} {% endif %}
@@ -24,6 +26,23 @@
         </div>
 
         <div class="sm:ml-auto gap-2 flex">
+            <a
+                href="?view={% if view_format == 'table' %}grid{% else %}table{% endif %}"
+                class="bg-white text-blue-500 px-3 py-2 rounded-md flex items-center gap-1 hover:bg-blue-600 hover:text-white hover:shadow-md"
+            >
+                <span class="material-symbols-outlined">
+                    {% if view_format == 'table' %}
+                        grid_view
+                    {% else %}
+                        table_view
+                    {% endif %}
+                </span>
+                {% if view_format == 'table' %}
+                    Grid View
+                {% else %}
+                    Table View
+                {% endif %}
+            </a>
             <a
                 href="{% url 'upload_file' %}"
                 class="bg-white text-blue-500 px-3 py-2 rounded-md flex items-center gap-1 hover:bg-blue-600 hover:text-white hover:shadow-md"
