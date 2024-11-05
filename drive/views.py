@@ -94,6 +94,31 @@ def user_files(request, folder_id=None):
     # Fichiers du dossier courant (ou dossier racine si pas de sous dossier)
     files = File.objects.filter(folder=current_folder, owner=request.user)
 
+    # Ficher avec des meta-données en plus pour afficher les informations
+    file_types = {
+        'image': ['jpg', 'jpeg', 'png', 'gif'],
+        'video': ['mp4', 'avi', 'mov', 'mkv'],
+        'audio': ['mp3', 'wav', 'flac', 'ogg'],
+        'text': ['txt', 'doc', 'docx', 'pdf', 'md'],
+        'archive': ['zip', 'rar', 'tar', '7z'],
+        'code': ['py', 'js', 'html', 'css', 'java', 'cpp', 'c', 'h', 'hpp', 'cs', 'php', 'rb', 'sh'],
+        'spreadsheet': ['xls', 'xlsx', 'ods'],
+        'presentation': ['ppt', 'pptx', 'odp'],
+        'database': ['sqlite', 'db', 'sql'],
+        'executable': ['exe', 'msi', 'deb', 'rpm'],
+        'font': ['ttf', 'otf', 'woff', 'woff2'],
+        'vector': ['svg', 'ai', 'eps'],
+        '3d': ['stl', 'obj', 'fbx', 'blend'],
+        'cad': ['dwg', 'dxf'],
+        'raster': ['psd', 'ai', 'eps'],
+    }
+    for file in files:
+        extension = file.file.name.split('.')[-1]
+        for type, exts in file_types.items():
+            if extension in exts:
+                file.type = type
+                break
+
     # List qui represente le path des dossiers avec un tuple qui donne le nom et l'id
     path = []
     folder = current_folder
@@ -104,7 +129,15 @@ def user_files(request, folder_id=None):
     path = path[::-1]
 
     # Render la page avec les fichiers et dossiers du user
-    return render(request, 'user_files.html', {
+    view_format = request.GET.get('view', 'table')
+    if view_format == 'grid':
+        return render(request, 'grid_view.html', {
+            'folders': folders,
+            'files': files,
+            'path': path
+        })
+    else:
+        return render(request, 'table_view.html', {
         'folders': folders,
         'files': files,
         'path': path
