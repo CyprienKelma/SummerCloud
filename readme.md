@@ -83,21 +83,20 @@ The web application will provide the maximum of the following features:
 
 [x] Browse files and folders on a web UI
 
-[ ] Display file properties and file metadata
+[X] Display file properties and file metadata
 
 [x] Upload files
 
 [x] Create folders
 
-[ ] Move and copy files and folders
+[X] Move and copy files and folders
 
-[ ] Each account has a drive limit of 100 MB (his folder on the server cannot exceed 100 MB)
+[X] Each account has a drive limit of 100 MB (his folder on the server cannot exceed 100 MB)
 
 [x] The max upload size is 40 MB (a file greater than 40MB cannot be uploaded)
 
-[ ] The web app provides an account info screen that shows statics using graphics
-
-[ ] Example of graphic : space distribution per format (images, documents, videos, ...)
+[X] The web app provides an account info screen that shows statics using graphics
+    Example of graphic : space distribution per format (images, documents, videos, ...)
 
 [ ] Preview the maximum of known formats (images, videos, pdf, source code, documents, ...)
 

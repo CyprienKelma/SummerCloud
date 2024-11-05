@@ -1,0 +1,181 @@
+{% extends "layout.html" %} {% block files %}
+<table class="w-full text-white">
+    <tr class="border-b text-left">
+        <th>File Name</th>
+        <th>Size</th>
+        <th>Type</th>
+        <th>Actions</th>
+    </tr>
+    {% for folder in folders %}
+    <tr
+        data-folder
+        data-draggable
+        data-folder-id="{{ folder.id }}"
+        data-item-type="folder"
+        data-item-id="{{ folder.id }}"
+    >
+        <td>
+            <a
+                href="{% url 'file_manager' folder.id %}?view={{ view_format }}"
+                class="hover:text-blue-200 flex items-center gap-1"
+                ><span class="material-symbols-outlined">folder</span>
+                {{folder.name }}</a
+            >
+        </td>
+        <td>Folder</td>
+        <td>Folder</td>
+        <td>
+            <form
+                method="post"
+                action="{% url 'delete_folder' folder.id %}"
+                class="inline"
+            >
+                {% csrf_token %}
+                <button type="submit" class="text-red-500 hover:text-red-700">
+                    Delete
+                </button>
+            </form>
+        </td>
+    </tr>
+    {% endfor %} {% for file in files %}
+
+    <tr data-draggable data-item-id="{{ file.id }}" data-item-type="file">
+        <td>
+            <a
+                href="{{ file.file.url }}"
+                alt="{{ file.name }}"
+                target="_blank"
+                class="hover:text-blue-200 flex items-center gap-1"
+            >
+                {% if file.type == "image" %}
+                <span class="material-symbols-outlined">image</span>
+                {% elif file.type == "video" %}
+                <span class="material-symbols-outlined">video</span>
+                {% elif file.type == "audio" %}
+                <span class="material-symbols-outlined">music_note</span>
+                {% else %}
+                <span class="material-symbols-outlined">description</span>
+                {% endif %} {{file.name }}</a
+            >
+        </td>
+        <td>{{ file.size_in_mb }} Mo</td>
+        <td>{{ file.type }}</td>
+        <td>
+            <form
+                method="post"
+                action="{% url 'delete_file' file.id %}"
+                class="inline"
+            >
+                {% csrf_token %}
+                <button type="submit" class="text-red-500 hover:text-red-700">
+                    Delete
+                </button>
+            </form>
+        </td>
+    </tr>
+    {% empty %}
+    <tr>
+        <td colspan="3" class="text-white">No files</td>
+    </tr>
+    {% endfor %}
+</table>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const items = document.querySelectorAll("[data-draggable]");
+        const folders = document.querySelectorAll("[data-folder]");
+        const breadcrumbFolders = document.querySelectorAll("[data-folder-id]");
+
+        items.forEach((item) => {
+            item.draggable = true;
+            // Vérifier si c'est un dossier ou un fichier
+            const itemType =
+                item.dataset.itemType ||
+                (item.hasAttribute("data-folder") ? "folder" : "file");
+
+            // Affecter l'attribut `data-item-type` en conséquence
+            item.setAttribute("data-item-type", itemType);
+
+            // Sélectionne l'ID du fichier ou du dossier
+            const itemId =
+                itemType === "folder"
+                    ? item.dataset.folderId
+                    : item.dataset.itemId;
+
+            console.log(
+                "Setting data-item-type:",
+                itemType,
+                "for item ID:",
+                itemId,
+            );
+
+            item.addEventListener("dragstart", (e) => {
+                if (!itemId || !itemType) {
+                    console.error("Missing item ID or item type");
+                    return;
+                }
+
+                console.log("Drag started for item with ID:", itemId);
+                console.log("Item type:", itemType);
+
+                // Enregistrer les données de l'élément dans `dataTransfer`
+                e.dataTransfer.setData("text/plain", itemId);
+                e.dataTransfer.setData("item-type", itemType);
+            });
+        });
+
+        [...folders, ...breadcrumbFolders].forEach((folder) => {
+            folder.addEventListener("dragover", (e) => {
+                e.preventDefault();
+                folder.classList.add("drop-target");
+            });
+
+            folder.addEventListener("dragleave", () => {
+                folder.classList.remove("drop-target");
+            });
+
+            folder.addEventListener("drop", (e) => {
+                e.preventDefault();
+                folder.classList.remove("drop-target");
+
+                const itemId = e.dataTransfer.getData("text/plain");
+                const itemType = e.dataTransfer.getData("item-type");
+                const destinationFolderId = folder.dataset.folderId;
+
+                console.log("Dragged item ID:", itemId);
+                console.log("Dragged item type:", itemType);
+                console.log("Destination folder ID:", destinationFolderId);
+
+                if (!itemId || !itemType) {
+                    console.error("Missing item ID or item type");
+                    return;
+                }
+
+                fetch(`/drive/files/move-item/`, {
+                    method: "POST",
+                    headers: {
+                        "X-CSRFToken": "{{ csrf_token }}",
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        item_id: itemId,
+                        item_type: itemType,
+                        destination_folder_id: destinationFolderId,
+                    }),
+                })
+                    .then((response) => response.json())
+                    .then((data) => {
+                        if (data.success) {
+                            location.reload();
+                        } else {
+                            alert(data.message);
+                        }
+                    })
+                    .catch((error) => {
+                        console.error("Error moving item:", error);
+                    });
+            });
+        });
+    });
+</script>
+{% endblock %}

@@ -18,17 +18,25 @@ def user_directory_path(instance, filename):
 
 
 class File(models.Model):
-    owner = models.ForeignKey(User, on_delete=models.CASCADE)  # le user qui possède ce fichier
-    name = models.CharField(max_length=255) # nom du file
-    file = models.FileField(upload_to=user_directory_path) # Chemin de ce fichier dans le dossier 'media'
-    size = models.BigIntegerField()  # en octets
-    upload_date = models.DateTimeField(auto_now_add=True)  # Date d'ajout du fichier sur SummerDrive
-    folder = models.ForeignKey('Folder', on_delete=models.CASCADE, null=True, blank=True)  # Dossier parent
+    owner = models.ForeignKey(User, on_delete=models.CASCADE)
+    name = models.CharField(max_length=255)
+    file = models.FileField(upload_to=user_directory_path)
+    size = models.BigIntegerField()
+    upload_date = models.DateTimeField(auto_now_add=True)
+    folder = models.ForeignKey('Folder', on_delete=models.CASCADE, null=True, blank=True)
+
+    FILE_TYPES = [
+        ('image', 'Image'),
+        ('document', 'Document'),
+        ('video', 'Vidéo'),
+        ('audio', 'Audio'),
+        ('other', 'Autre'),
+    ]
+    type = models.CharField(max_length=10, choices=FILE_TYPES, default='other')
 
     def __str__(self):
         return self.name
 
-    # Pour afficher la des fichiers en mb
     @property
     def size_in_mb(self):
         return round(self.size / (1024 * 1024), 2)

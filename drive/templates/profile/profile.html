@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% block content %}
+<style>
+
+    .round-container {
+        width: 100%;
+        max-width: 460px;
+        max-height: 350px;
+        margin: 0 auto;
+        padding-top: 10px;
+        padding-bottom: 10px;
+    }
+
+    .round-container canvas {
+        max-width: 300px;
+        max-height: 300px;
+        margin: auto auto;
+    }
+
+    .chart-container {
+        width: 100%;
+        max-width: 700px;
+        max-height: 400px;
+        margin: 0 auto;
+    }
+
+    .chart-container canvas {
+        width: 100%;
+        height: 70%;
+    }
+</style>
+<div class="container mx-auto mt-8">
+
+    <!-- Section profil du user -->
+    <div class="flex items-center mb-8 bg-white rounded-lg max-w-[40%]">
+        <div class="rounded-full bg-white w-24 h-24 flex items-center justify-center text-blue-500">
+            <span style="font-size:80px" class="material-symbols-outlined text-[20rem] ">
+                account_circle
+            </span>
+        </div>
+        <div class="ml-4 text-blue-500">
+            <h2 class="text-4xl font-semibold">User : {{ user.username }}</h2>
+            <p class="text-lg font-semibold text-blue-500">Date of Creation : {{ account_creation_date|date:"d-m-Y" }}</p>
+        </div>
+    </div>
+
+    <!-- Graphiques -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-16">
+        <!-- Graphique (1) : Répartition des types de fichiers -->
+        <div class="round-container bg-white w-full items-center justify-center rounded-xl mb-24 p-4">
+            <h3 class="text-lg text-blue-500 text-center">Répartition des types de fichiers</h3>
+            <canvas id="fileTypeChart"></canvas>
+        </div>
+
+        <!-- Graphique (2) : Utilisation du stockage au fil du temps -->
+        <div class="chart-container bg-white w-full rounded-xl p-4">
+            <h3 class="text-lg text-blue-500 text-center">Utilisation du stockage au fil du temps</h3>
+            <canvas id="storageOverTimeChart"></canvas>
+        </div>
+    </div>
+</div>
+
+<!-- Scripts pour les graphiques -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Graphique (1) : Répartition des types de fichiers
+        const fileTypeChart = new Chart(document.getElementById('fileTypeChart').getContext('2d'), {
+            type: 'pie',
+            data: {
+                labels: {{ types|safe }},
+                datasets: [{
+                    data: {{ sizes_by_type|safe }},
+                    backgroundColor: ["#FF6384", "#36A2EB", "#FFCE56", "#FF9999", "#66CCCC"]
+                }]
+            },
+        });
+
+        // Graphique (2) : Utilisation du stockage au fil du temps
+        const storageOverTimeChart = new Chart(document.getElementById('storageOverTimeChart').getContext('2d'), {
+            type: 'line',
+            data: {
+                labels: {{ months|safe }},
+                datasets: [{
+                    label: "Utilisation en Mo",
+                    data: {{ sizes_over_time|safe }},
+                    fill: false,
+                    borderColor: "rgb(75, 192, 192)",
+                    tension: 0.1
+                }]
+            }
+        });
+    });
+</script>
+{% endblock %}
