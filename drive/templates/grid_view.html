@@ -1,0 +1,87 @@
+{% extends "layout.html" %} {% block files %}
+<div
+    class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 text-white"
+>
+    {% for folder in folders %}
+    <div class="bg-gray-800 p-4 rounded-lg">
+        <!-- Folder Preview -->
+        <a
+            href="{% url 'file_manager' folder.id %}"
+            class="hover:text-blue-200 flex flex-col items-center gap-2"
+        >
+            <span class="material-symbols-outlined text-5xl">folder</span>
+            <span class="font-bold">{{ folder.name }}</span>
+        </a>
+        <p class="text-sm mt-1">Folder</p>
+        <div class="mt-2">
+            <form
+                method="post"
+                action="{% url 'delete_folder' folder.id %}"
+                class="inline"
+            >
+                {% csrf_token %}
+                <button type="submit" class="text-red-500 hover:text-red-700">
+                    Delete
+                </button>
+            </form>
+        </div>
+    </div>
+    {% endfor %} {% for file in files %}
+    <div class="bg-gray-800 p-4 rounded-lg">
+        <!-- File Preview -->
+        <a
+            href="{{ file.file.url }}"
+            alt="{{ file.name }}"
+            target="_blank"
+            class="hover:text-blue-200 flex flex-col items-center gap-2"
+        >
+            {% if file.type == 'image' %}
+            <!-- Image Preview -->
+            <img
+                src="{{ file.file.url }}"
+                alt="{{ file.name }}"
+                class="w-24 h-24 object-cover rounded-lg"
+            />
+
+            {% elif file.type == 'video' %}
+            <!-- Video Thumbnail or Icon -->
+            <video class="w-24 h-24 object-cover rounded-lg" muted>
+                <source src="{{ file.file.url }}" type="video/mp4" />
+                <!-- Fallback icon if preview is unavailable -->
+                <span class="material-symbols-outlined text-5xl"
+                    >video_library</span
+                >
+            </video>
+
+            {%elif file.type == 'audio'%}
+            <!-- Audio Icon -->
+            <span class="material-symbols-outlined text-5xl">music_note</span>
+
+            {%else%}
+            <!-- Generic File Icon -->
+            <span class="material-symbols-outlined text-5xl">description</span>
+
+            {%endif%}
+            <span class="font-bold">{{ file.name }}</span>
+        </a>
+        <p class="text-sm mt-1">{{ file.size_in_mb }} Mo</p>
+        <p class="text-sm">{{ file.type }}</p>
+        <div class="mt-2">
+            <form
+                method="post"
+                action="{% url 'delete_file' file.id %}"
+                class="inline"
+            >
+                {% csrf_token %}
+                <button type="submit" class="text-red-500 hover:text-red-700">
+                    Delete
+                </button>
+            </form>
+        </div>
+    </div>
+    {% empty %}
+    <p class="text-white">No files available</p>
+    {% endfor %}
+</div>
+
+{% endblock %}
