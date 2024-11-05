@@ -1,8 +1,8 @@
 {% extends 'registration/base.html' %} {% block content %}
 <div class="container mx-auto">
-    <h2 class="text-2xl font-semibold">Login</h2>
+    <h2 class="text-white text-3xl font-bold">Login</h2>
     <!-- a form with a cloudy style -->
-    <form method="POST" class="gap-4">
+    <form method="POST" class="gap-4 font-semibold space-y-3 lg:max-w-[30%]">
         {% csrf_token %}
         <div class="flex flex-col gap-2">
             <label for="id_username" class="">Username:</label>

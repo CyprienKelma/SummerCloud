@@ -28,4 +28,7 @@ urlpatterns = [
 
     # Suppression d'un dossier
     path('delete-folder/<int:folder_id>/', views.delete_folder, name='delete_folder'),
+
+    # Déplacement d'un fichier/dossier (drag & drop)
+    path('files/move-item/', views.move_item, name='move_item'),
 ]
