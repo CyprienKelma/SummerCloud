@@ -1,24 +1,44 @@
-{% extends 'base.html' %} {% block content %}
-<h2>Uploader un fichier</h2>
-<form method="post" enctype="multipart/form-data">
-    {% csrf_token %} {{ form.as_p }}
-    <button type="submit">Téléverser</button>
-</form>
-{% if messages %}
-    <ul class="messages">
+{% extends "base.html" %} {% block content %}
+
+<div class="bg-white p-6 rounded-lg max-w-md mx-auto text-blue-600">
+    <h2 class="text-2xl font-bold mb-4">Uploader un fichier</h2>
+    <form method="post" enctype="multipart/form-data" class="space-y-4">
+        {% csrf_token %} {{ form.as_p }}
+        <button
+            type="submit"
+            class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg"
+        >
+            Téléverser
+        </button>
+    </form>
+
+    {% if messages %}
+    <ul class="messages mt-4 space-y-2">
         {% for message in messages %}
-            <li class="{{ message.tags }}">{{ message }}</li>
+        <li
+            class="{{ message.tags }} bg-green-100 border-l-4 border-green-500 text-green-700 p-2 rounded-lg"
+        >
+            {{ message }}
+        </li>
         {% endfor %}
     </ul>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const messages = document.querySelectorAll('.messages li');
-            messages.forEach(function(message) {
-                alert(message.textContent);
-            });
-            // enlève les messages une fois que l'on a cliqué sur ok
-            document.querySelector('.messages').remove();
+    <script defer>
+        const messages = document.querySelectorAll(".messages li");
+        messages.forEach(function (message) {
+            alert(message.textContent);
         });
+        // Remove messages after displaying alerts
+        document.querySelector(".messages").remove();
     </script>
-{% endif %}
+    {% endif %}
+</div>
+<script defer>
+    // change the preselected value of the #id_folder field to the value of the folder query parameter
+    const urlParams = new URLSearchParams(window.location.search);
+    const folder_id = urlParams.get("folder");
+    console.log(folder_id);
+    if (folder_id) {
+        document.querySelector("#id_folder").value = folder_id;
+    }
+</script>
 {% endblock %}

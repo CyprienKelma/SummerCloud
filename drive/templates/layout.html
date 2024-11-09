@@ -18,7 +18,8 @@
                 <a
                     href="{% url 'file_manager' id %}?view={{ view_format }}"
                     class="hover:text-blue-200 hover:underline"
-                    data-folder-id="{{ id }}" data-draggable
+                    data-folder-id="{{ id }}"
+                    data-draggable
                     >{{ name }}</a
                 >
                 {% endfor %} {% endif %}
@@ -31,26 +32,20 @@
                 class="bg-white text-blue-500 px-3 py-2 rounded-md flex items-center gap-1 hover:bg-blue-600 hover:text-white hover:shadow-md"
             >
                 <span class="material-symbols-outlined">
-                    {% if view_format == 'table' %}
-                        grid_view
-                    {% else %}
-                        table_view
-                    {% endif %}
+                    {% if view_format == 'table' %} grid_view {% else %}
+                    table_view {% endif %}
                 </span>
-                {% if view_format == 'table' %}
-                    Grid View
-                {% else %}
-                    Table View
+                {% if view_format == 'table' %} Grid View {% else %} Table View
                 {% endif %}
             </a>
             <a
-                href="{% url 'upload_file' %}"
+                href="{% url 'upload_file' %}?folder={{ folder_id }}"
                 class="bg-white text-blue-500 px-3 py-2 rounded-md flex items-center gap-1 hover:bg-blue-600 hover:text-white hover:shadow-md"
                 ><span class="material-symbols-outlined"> cloud_upload </span
                 >Upload</a
             >
             <a
-                href="{% url 'create_folder' %}"
+                href="{% url 'create_folder' %}?folder={{ folder_id }}"
                 class="bg-white text-blue-500 px-3 py-2 rounded-md flex items-center gap-1 hover:bg-blue-600 hover:text-white hover:shadow-md"
                 ><span class="material-symbols-outlined">
                     create_new_folder </span

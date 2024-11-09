@@ -1,7 +1,23 @@
 {% extends 'base.html' %} {% block content %}
-<h2>Créer un nouveau dossier</h2>
-<form method="post">
-    {% csrf_token %} {{ form.as_p }}
-    <button type="submit">Créer</button>
-</form>
+<div class="bg-white p-6 rounded-lg max-w-md mx-auto text-blue-600">
+    <h2 class="text-2xl font-bold mb-4">Créer un nouveau dossier</h2>
+    <form method="post" class="space-y-4">
+        {% csrf_token %} {{ form.as_p }}
+        <button
+            type="submit"
+            class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg"
+        >
+            Créer
+        </button>
+    </form>
+</div>
+<script defer>
+    // change the preselected value of the #id_folder field to the value of the folder query parameter
+    const urlParams = new URLSearchParams(window.location.search);
+    const folder_id = urlParams.get("folder");
+    console.log(folder_id);
+    if (folder_id) {
+        document.querySelector("#id_folder").value = folder_id;
+    }
+</script>
 {% endblock %}

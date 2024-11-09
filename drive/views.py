@@ -97,9 +97,14 @@ def upload_file(request):
                                         "Vous avez atteint la limite de stockage de 100 Mo.")
                 return redirect('upload_file')
 
+            # Si le fichier existe déjà dans le dossier, on ajoute un suffixe pour le différencier
+            if File.objects.filter(folder=file_instance.folder, name=file_instance.name).exists():
+                file_instance.name = f"{file_instance.name.split('.')[0]}_1.{file_instance.name.split('.')[-1]}"
+
 
             file_instance.save()
-            return redirect('user_files')  # Redirection après succès
+            # Redirige vers la page de gestion des fichiers sur le dossier ou le fichier a été ajouté
+            return redirect('file_manager', folder_id=file_instance.folder.id)
     else:
         # Passe la liste des dossiers de l'utilisateur pour afficher un choix de dossier
         user_folders = Folder.objects.filter(owner=request.user)
@@ -174,9 +179,11 @@ def user_files(request, folder_id=None):
     # Inverse la liste pour avoir le path du dossier courant au dossier racine
     path = path[::-1]
 
+
     # Render la page avec les fichiers et dossiers du user
     view_format = request.GET.get('view', 'table')
     context = {
+        'folder_id': folder_id,
         'folders': folders,
         'files': files,
         'path': path,
@@ -239,6 +246,23 @@ def move_item(request):
         return JsonResponse({"success": True})
     except Exception as e:
         return JsonResponse({"success": False, "message": str(e)})
+
+@login_required
+@require_POST
+def duplicate_file(request, file_id):
+    file = get_object_or_404(File, id=file_id, owner=request.user)
+
+    new_file = File(
+        owner=request.user,
+        folder=file.folder,
+        file=file.file,
+        size=file.size,
+        name=file.name
+    )
+    new_file.save()
+
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER', 'redirect_if_referer_not_found'))
+
 
 def profile(request):
     # Données pour le graphique d'usage du stockagee par le user en fonction du temps

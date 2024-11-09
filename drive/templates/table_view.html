@@ -50,7 +50,7 @@
                 {% if file.type == "image" %}
                 <span class="material-symbols-outlined">image</span>
                 {% elif file.type == "video" %}
-                <span class="material-symbols-outlined">video</span>
+                <span class="material-symbols-outlined">movie</span>
                 {% elif file.type == "audio" %}
                 <span class="material-symbols-outlined">music_note</span>
                 {% else %}
@@ -61,6 +61,7 @@
         <td>{{ file.size_in_mb }} Mo</td>
         <td>{{ file.type }}</td>
         <td>
+            <!-- delete file -->
             <form
                 method="post"
                 action="{% url 'delete_file' file.id %}"

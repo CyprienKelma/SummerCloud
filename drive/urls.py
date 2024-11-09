@@ -35,4 +35,7 @@ urlpatterns = [
     # Déplacement d'un fichier/dossier (drag & drop)
     path('files/move-item/', views.move_item, name='move_item'),
 
+    # Duplication d'un fichier
+    path('duplicate-file/<int:file_id>/', views.duplicate_file, name='duplicate_file'),
+
 ]
